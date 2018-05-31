@@ -8,17 +8,19 @@
 
 #import "PreferenceController.h"
 
+#include "disasm.h" // for the disassembler flags
+
 @implementation MVPreferenceController
 
--(id)init
+-(instancetype)init
 {
   self = [super initWithWindowNibName:@"Preferences"];
   return self;
 }
 
-- (IBAction)toggleOpenAtLaunch:(id)sender
+- (IBAction)toggleUseLLVMDisassembler:(id)sender
 {
-  // nothing to do here?
+  qflag = (useLLVMDisassembler.state == NSOnState);
 }
 
 @end

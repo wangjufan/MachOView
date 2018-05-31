@@ -6,11 +6,6 @@
  *
  */
 
-#include <string>
-#include <vector>
-#include <set>
-#include <map>
-
 #import "Common.h"
 #import "LinkEdit.h"
 #import "ReadWrite.h"
@@ -40,7 +35,8 @@ using namespace std;
   
   for (uint32_t nreloc = 0; nreloc < length / sizeof(struct relocation_info); ++nreloc)
   {
-    if ([backgroundThread isCancelled]) break;
+    if (backgroundThread.cancelled)
+      break;
     
     // normal:    relocation_info != NULL, scattered_relocation_info == NULL
     // scattered: relocation_info == NULL, scattered_relocation_info != NULL
@@ -107,9 +103,8 @@ using namespace std;
                                   ? [NSString stringWithFormat:@"0x%X (%@)", nlist->n_value, symbolName]
                                   : symbolName];
         
-        [symbolNames setObject:[NSString stringWithFormat:@"%@->%@",
-                                [self findSymbolAtRVA:[self fileOffsetToRVA:relocLocation]],symbolName]
-                        forKey:[NSNumber numberWithUnsignedLong:[self fileOffsetToRVA:relocLocation]]];
+        symbolNames[@([self fileOffsetToRVA:relocLocation])] =
+          [NSString stringWithFormat:@"%@->%@", [self findSymbolAtRVA:[self fileOffsetToRVA:relocLocation]], symbolName];
 
         if ((nlist->n_type & N_TYPE) == N_SECT)
         {
@@ -165,9 +160,8 @@ using namespace std;
           
           [node.details appendRow:@"":@"":@"Target":(symbolName = [self findSymbolAtRVA:relocValue])];
           
-          [symbolNames setObject:[NSString stringWithFormat:@"%@->%@",
-                                  [self findSymbolAtRVA:[self fileOffsetToRVA:relocLocation]],symbolName]
-                          forKey:[NSNumber numberWithUnsignedLong:[self fileOffsetToRVA:relocLocation]]];
+          symbolNames[@([self fileOffsetToRVA:relocLocation])] =
+            [NSString stringWithFormat:@"%@->%@", [self findSymbolAtRVA:[self fileOffsetToRVA:relocLocation]], symbolName];
         }
       }
 
@@ -188,7 +182,7 @@ using namespace std;
           (mach_header->cputype == CPU_TYPE_I386 && (r_type == GENERIC_RELOC_SECTDIFF || r_type == GENERIC_RELOC_LOCAL_SECTDIFF))
           ||
           (mach_header->cputype == CPU_TYPE_ARM && (r_type == ARM_RELOC_SECTDIFF || r_type == ARM_RELOC_LOCAL_SECTDIFF))
-          )
+         )
       {
         prev_scattered_relocation_info = scattered_relocation_info;
       }
@@ -242,17 +236,17 @@ using namespace std;
     else if (mach_header->cputype == CPU_TYPE_ARM)
     {
       uint32_t r_type = (relocation_info ? relocation_info->r_type : scattered_relocation_info->r_type);
-      
+     
       [node.details appendRow:@"":@"":@"Type"
                              :r_type == ARM_RELOC_VANILLA ? @"ARM_RELOC_VANILLA" :
                               r_type == ARM_RELOC_PAIR ? @"ARM_RELOC_PAIR" :
                               r_type == ARM_RELOC_SECTDIFF ? @"ARM_RELOC_SECTDIFF" :
                               r_type == ARM_RELOC_LOCAL_SECTDIFF ? @"ARM_RELOC_LOCAL_SECTDIFF" :
-                              r_type == ARM_RELOC_PB_LA_PTR ? @"ARM_RELOC_PB_LA_PTR" : 
+                              r_type == ARM_RELOC_PB_LA_PTR ? @"ARM_RELOC_PB_LA_PTR" :
                               r_type == ARM_RELOC_BR24 ? @"ARM_RELOC_BR24" :
-                              r_type == ARM_THUMB_RELOC_BR22 ? @"ARM_THUMB_RELOC_BR22" : 
+                              r_type == ARM_THUMB_RELOC_BR22 ? @"ARM_THUMB_RELOC_BR22" :
                               r_type == ARM_THUMB_32BIT_BRANCH ? @"ARM_THUMB_32BIT_BRANCH" :
-                              r_type == ARM_RELOC_HALF ? @"ARM_RELOC_HALF" : 
+                              r_type == ARM_RELOC_HALF ? @"ARM_RELOC_HALF" :
                               r_type == ARM_RELOC_HALF_SECTDIFF ? @"ARM_RELOC_HALF_SECTDIFF" : @"?????"];
     }
     
@@ -307,7 +301,8 @@ using namespace std;
   
   for (uint32_t nreloc = 0; nreloc < length / sizeof(struct relocation_info); ++nreloc)
   {
-    if ([backgroundThread isCancelled]) break;
+    if (backgroundThread.cancelled)
+      break;
     
     // In the Mac OS X x86-64 environment scattered relocations are not used. Compiler-generated code
     // uses mostly external relocations, in which the r_extern bit is set to 1 and the r_symbolnum field contains
@@ -356,9 +351,8 @@ using namespace std;
                                 ? [NSString stringWithFormat:@"0x%qX (%@)", nlist_64->n_value, symbolName]
                                 : symbolName];
       
-      [symbolNames setObject:[NSString stringWithFormat:@"%@->%@",
-                              [self findSymbolAtRVA64:[self fileOffsetToRVA64:relocLocation]],symbolName]
-                      forKey:[NSNumber numberWithUnsignedLongLong:[self fileOffsetToRVA64:relocLocation]]];
+      symbolNames[@([self fileOffsetToRVA64:relocLocation])] =
+        [NSString stringWithFormat:@"%@->%@", [self findSymbolAtRVA64:[self fileOffsetToRVA64:relocLocation]], symbolName];
 
       // For the x86_64 architecure on Mac OS X it is possible to
       // encode a signed 32-bit expression of the form:
@@ -442,8 +436,8 @@ using namespace std;
           if (mach_header_64->cputype == CPU_TYPE_X86_64)
           {
             relocAddend -= (relocation_info->r_type == X86_64_RELOC_SIGNED_1 ? 1 :
-                                   relocation_info->r_type == X86_64_RELOC_SIGNED_2 ? 2 :
-                                   relocation_info->r_type == X86_64_RELOC_SIGNED_4 ? 4 : 0);
+                            relocation_info->r_type == X86_64_RELOC_SIGNED_2 ? 2 :
+                            relocation_info->r_type == X86_64_RELOC_SIGNED_4 ? 4 : 0);
           }
           
           if (relocAddend != 0)
@@ -495,11 +489,11 @@ using namespace std;
           if (mach_header_64->cputype == CPU_TYPE_X86_64)
           {
             relocAddend -= (relocation_info->r_type == X86_64_RELOC_SIGNED_1 ? 1 :
-                                   relocation_info->r_type == X86_64_RELOC_SIGNED_2 ? 2 :
-                                   relocation_info->r_type == X86_64_RELOC_SIGNED_4 ? 4 : 0);
+                            relocation_info->r_type == X86_64_RELOC_SIGNED_2 ? 2 :
+                            relocation_info->r_type == X86_64_RELOC_SIGNED_4 ? 4 : 0);
           }
           
-          if (relocAddend != 0) 
+          if (relocAddend != 0)
           {
             [node.details appendRow:@"":@"":@"Addend"
                                    :(int32_t)relocAddend < 0
@@ -601,9 +595,9 @@ using namespace std;
             if (mach_header_64->cputype == CPU_TYPE_X86_64)
             {
               relocValue -= (relocation_info->r_type == X86_64_RELOC_SIGNED_1 ? 1 :
-                           relocation_info->r_type == X86_64_RELOC_SIGNED_2 ? 2 :
-                           relocation_info->r_type == X86_64_RELOC_SIGNED_4 ? 4 : 0);
-          }
+                             relocation_info->r_type == X86_64_RELOC_SIGNED_2 ? 2 :
+                             relocation_info->r_type == X86_64_RELOC_SIGNED_4 ? 4 : 0);
+            }
             
           }
         }
@@ -625,9 +619,8 @@ using namespace std;
         // update real data
         [self addRelocAtFileOffset:relocLocation withLength:relocLength andValue:relocValue];
         
-        [symbolNames setObject:[NSString stringWithFormat:@"%@->%@",
-                                [self findSymbolAtRVA64:[self fileOffsetToRVA64:relocLocation]],symbolName]
-                        forKey:[NSNumber numberWithUnsignedLongLong:[self fileOffsetToRVA64:relocLocation]]];
+        symbolNames[@([self fileOffsetToRVA64:relocLocation])] =
+          [NSString stringWithFormat:@"%@->%@", [self findSymbolAtRVA64:[self fileOffsetToRVA64:relocLocation]], symbolName];
 
         //NSLog(@"%@ %.16qX --> (%u) %@",[self findSectionContainsRVA64:[self fileOffsetToRVA64:relocLocation]],[self fileOffsetToRVA64:relocLocation],relocLength,[self findSymbolAtRVA64:relocValue]);
       }
@@ -636,16 +629,16 @@ using namespace std;
     
     if (mach_header_64->cputype == CPU_TYPE_X86_64)
     {
-    [node.details appendRow:@"":@"":@"Type"
-                           :relocation_info->r_type == X86_64_RELOC_UNSIGNED ? @"X86_64_RELOC_UNSIGNED" :
-                            relocation_info->r_type == X86_64_RELOC_SIGNED ? @"X86_64_RELOC_SIGNED" :
-                            relocation_info->r_type == X86_64_RELOC_BRANCH ? @"X86_64_RELOC_BRANCH" :
-                            relocation_info->r_type == X86_64_RELOC_GOT_LOAD ? @"X86_64_RELOC_GOT_LOAD" :
-                            relocation_info->r_type == X86_64_RELOC_GOT ? @"X86_64_RELOC_GOT" :
-                            relocation_info->r_type == X86_64_RELOC_SUBTRACTOR ? @"X86_64_RELOC_SUBTRACTOR" :
-                            relocation_info->r_type == X86_64_RELOC_SIGNED_1 ? @"X86_64_RELOC_SIGNED_1" :
-                            relocation_info->r_type == X86_64_RELOC_SIGNED_2 ? @"X86_64_RELOC_SIGNED_2" :
-                            relocation_info->r_type == X86_64_RELOC_SIGNED_4 ? @"X86_64_RELOC_SIGNED_4" : @"?????"];
+      [node.details appendRow:@"":@"":@"Type"
+                             :relocation_info->r_type == X86_64_RELOC_UNSIGNED ? @"X86_64_RELOC_UNSIGNED" :
+                              relocation_info->r_type == X86_64_RELOC_SIGNED ? @"X86_64_RELOC_SIGNED" :
+                              relocation_info->r_type == X86_64_RELOC_BRANCH ? @"X86_64_RELOC_BRANCH" :
+                              relocation_info->r_type == X86_64_RELOC_GOT_LOAD ? @"X86_64_RELOC_GOT_LOAD" :
+                              relocation_info->r_type == X86_64_RELOC_GOT ? @"X86_64_RELOC_GOT" :
+                              relocation_info->r_type == X86_64_RELOC_SUBTRACTOR ? @"X86_64_RELOC_SUBTRACTOR" :
+                              relocation_info->r_type == X86_64_RELOC_SIGNED_1 ? @"X86_64_RELOC_SIGNED_1" :
+                              relocation_info->r_type == X86_64_RELOC_SIGNED_2 ? @"X86_64_RELOC_SIGNED_2" :
+                              relocation_info->r_type == X86_64_RELOC_SIGNED_4 ? @"X86_64_RELOC_SIGNED_4" : @"?????"];
     }
     else if (mach_header_64->cputype == CPU_TYPE_ARM64)
     {
@@ -697,7 +690,8 @@ using namespace std;
   
   for (uint32_t nsym = 0; nsym < length / sizeof(struct nlist); ++nsym)
   {
-    if ([backgroundThread isCancelled]) break;
+    if (backgroundThread.cancelled)
+      break;
     
     MATCH_STRUCT(nlist, location + nsym * sizeof(struct nlist))
     
@@ -706,12 +700,6 @@ using namespace std;
     NSString * symbolName = NSSTRING(strtab + nlist->n_un.n_strx);
     NSColor * color = nil;
     
-    /* print the symbol nr */
-    [node.details appendRow:[NSString stringWithFormat:@"#%d", nsym]
-                           :@""
-                           :@""
-                           :@""];
-      
     [dataController read_uint32:range lastReadHex:&lastReadHex];
     [node.details appendRow:[NSString stringWithFormat:@"%.8lX", range.location]
                            :lastReadHex
@@ -789,7 +777,7 @@ using namespace std;
                                libOrdinal == SELF_LIBRARY_ORDINAL ? @"SELF_LIBRARY_ORDINAL" :
                                libOrdinal == DYNAMIC_LOOKUP_ORDINAL ? @"DYNAMIC_LOOKUP_ORDINAL" :
                                libOrdinal == EXECUTABLE_ORDINAL ? @"EXECUTABLE_ORDINAL" :
-                               [NSSTRING((uint8_t *)dylib + dylib->name.offset - sizeof(struct load_command)) lastPathComponent]]];
+                               NSSTRING((uint8_t *)dylib + dylib->name.offset - sizeof(struct load_command)).lastPathComponent]];
     }
     
     if ((nlist->n_desc & N_ARM_THUMB_DEF) == N_ARM_THUMB_DEF)               [node.details appendRow:@"":@"":@"0008":@"N_ARM_THUMB_DEF"];
@@ -823,13 +811,12 @@ using namespace std;
         // it is possible to associate more than one symbol to the same address.
         // every new symbol will be appended to the list
         
-        NSString * nameToStore = [symbolNames objectForKey:[NSNumber numberWithUnsignedLong:nlist->n_value]];
+        NSString * nameToStore = symbolNames[@(nlist->n_value)];
         nameToStore = (nameToStore != nil 
                        ? [nameToStore stringByAppendingFormat:@"(%@)", symbolName] 
                        : [NSString stringWithFormat:@"0x%X (%@)", nlist->n_value, symbolName]);
         
-        [symbolNames setObject:nameToStore
-                        forKey:[NSNumber numberWithUnsignedLong:nlist->n_value]];
+        symbolNames[@(nlist->n_value)] = nameToStore;
       }
     } 
     else
@@ -841,8 +828,7 @@ using namespace std;
       
       // fill in lookup table with undefined sybols (key equals (-1) * index)
       uint32_t key = *symbols.begin() - nlist - 1;
-      [symbolNames setObject:symbolName
-                      forKey:[NSNumber numberWithUnsignedLong:key]];
+      symbolNames[@(key)] = symbolName;
     }
 
     [node.details setAttributesFromRowIndex:bookmark:MVMetaDataAttributeName,symbolName,
@@ -867,7 +853,8 @@ using namespace std;
   
   for (uint32_t nsym = 0; nsym < length / sizeof(struct nlist_64); ++nsym)
   {
-    if ([backgroundThread isCancelled]) break;
+    if (backgroundThread.cancelled)
+      break;
     
     MATCH_STRUCT(nlist_64, location + nsym * sizeof(struct nlist_64))
     
@@ -876,12 +863,6 @@ using namespace std;
     NSString * symbolName = NSSTRING(strtab + nlist_64->n_un.n_strx);
     NSColor * color = nil;
     
-    /* print the symbol nr */
-    [node.details appendRow:[NSString stringWithFormat:@"#%d", nsym]
-                           :@""
-                           :@""
-                           :@""];
-
     [dataController read_uint32:range lastReadHex:&lastReadHex];
     [node.details appendRow:[NSString stringWithFormat:@"%.8lX", range.location]
                            :lastReadHex
@@ -959,7 +940,7 @@ using namespace std;
                                libOrdinal == SELF_LIBRARY_ORDINAL ? @"SELF_LIBRARY_ORDINAL" :
                                libOrdinal == DYNAMIC_LOOKUP_ORDINAL ? @"DYNAMIC_LOOKUP_ORDINAL" :
                                libOrdinal == EXECUTABLE_ORDINAL ? @"EXECUTABLE_ORDINAL" :
-                               [NSSTRING((uint8_t *)dylib + dylib->name.offset - sizeof(struct load_command)) lastPathComponent]]];
+                               NSSTRING((uint8_t *)dylib + dylib->name.offset - sizeof(struct load_command)).lastPathComponent]];
     }
     
     if ((nlist_64->n_desc & REFERENCED_DYNAMICALLY) == REFERENCED_DYNAMICALLY)  [node.details appendRow:@"":@"":@"0010":@"REFERENCED_DYNAMICALLY"];
@@ -987,13 +968,12 @@ using namespace std;
         // it is possible to associate more than one symbol to the same address.
         // every new symbol will be appended to the list
 
-        NSString * nameToStore = [symbolNames objectForKey:[NSNumber numberWithUnsignedLongLong:nlist_64->n_value]];
+        NSString * nameToStore = symbolNames[@(nlist_64->n_value)];
         nameToStore = (nameToStore != nil 
                        ? [nameToStore stringByAppendingFormat:@"(%@)", symbolName] 
                        : [NSString stringWithFormat:@"0x%qX (%@)", nlist_64->n_value, symbolName]);
         
-        [symbolNames setObject:nameToStore
-                        forKey:[NSNumber numberWithUnsignedLongLong:nlist_64->n_value]];
+        symbolNames[@(nlist_64->n_value)] = nameToStore;
       }
     } 
     else
@@ -1005,8 +985,7 @@ using namespace std;
       
       // fill in lookup table with undefined sybols (key equals (-1) * index)
       uint64_t key = *symbols_64.begin() - nlist_64 - 1;
-      [symbolNames setObject:symbolName
-                      forKey:[NSNumber numberWithUnsignedLongLong:key]];
+      symbolNames[@(key)] = symbolName;
     }
     
     [node.details setAttributesFromRowIndex:bookmark:MVMetaDataAttributeName,symbolName,
@@ -1108,7 +1087,7 @@ using namespace std;
         
       // calculate indirect value location
       uint32_t indirectAddress = section->addr + (nindsym - section->reserved1) * length;
-        
+      
       // accumulate search info
       NSUInteger bookmark = node.details.rowCount;
       NSString * symbolName = nil;
@@ -1116,7 +1095,7 @@ using namespace std;
         
       // read indirect symbol index
       uint32_t indirectIndex = [dataController read_uint32:range lastReadHex:&lastReadHex];
-        
+      
       if ((indirectIndex & (INDIRECT_SYMBOL_LOCAL | INDIRECT_SYMBOL_ABS)) == 0)
       {
         if (indirectIndex >= symbols.size())
@@ -1133,9 +1112,8 @@ using namespace std;
                                :symbolName];
           
         // fill in lookup table with indirect sybols
-        [symbolNames setObject:[NSString stringWithFormat:@"[%@->%@]",
-                                [self findSymbolAtRVA:indirectAddress],symbolName]
-                        forKey:[NSNumber numberWithUnsignedLong:indirectAddress]];
+        symbolNames[@(indirectAddress)] =
+          [NSString stringWithFormat:@"[%@->%@]", [self findSymbolAtRVA:indirectAddress], symbolName];
       }
       else
       {
@@ -1155,8 +1133,7 @@ using namespace std;
             NSRange range = NSMakeRange(indirectAddress - section->addr + section->offset + imageOffset, 0);
             uint32_t targetAddress = [dataController read_uint32:range lastReadHex:&lastReadHex];
             [node.details appendRow:@"":@"":@"Target":(symbolName = [self findSymbolAtRVA:targetAddress])];
-            symbolName = [NSString stringWithFormat:@"[%@->%@]",
-                          [self findSymbolAtRVA:indirectAddress],symbolName];
+            symbolName = [NSString stringWithFormat:@"[%@->%@]", [self findSymbolAtRVA:indirectAddress], symbolName];
           } break;
 
           case INDIRECT_SYMBOL_ABS:
@@ -1176,8 +1153,7 @@ using namespace std;
         }
 
         // fill in lookup table with special indirect sybols
-        [symbolNames setObject:symbolName
-                        forKey:[NSNumber numberWithUnsignedLong:indirectAddress]];
+        symbolNames[@(indirectAddress)] = symbolName;
       }
         
       [node.details appendRow:@"":@"":@"Section"
@@ -1236,7 +1212,7 @@ using namespace std;
         
       // calculate indirect value location
       uint64_t indirectAddress = section_64->addr + (nindsym - section_64->reserved1) * length;
-        
+
       // accumulate search info
       NSUInteger bookmark = node.details.rowCount;
       NSString * symbolName = nil;
@@ -1261,9 +1237,7 @@ using namespace std;
                                :symbolName];
         
         // fill in lookup table with indirect sybols
-        [symbolNames setObject:[NSString stringWithFormat:@"[%@->%@]",
-                                [self findSymbolAtRVA64:indirectAddress],symbolName]
-                        forKey:[NSNumber numberWithUnsignedLongLong:indirectAddress]];
+        symbolNames[@(indirectAddress)] = [NSString stringWithFormat:@"[%@->%@]", [self findSymbolAtRVA64:indirectAddress], symbolName];
       }
       else
       {
@@ -1304,8 +1278,7 @@ using namespace std;
         }
         
         // fill in lookup table with special indirect sybols
-        [symbolNames setObject:symbolName
-                        forKey:[NSNumber numberWithUnsignedLongLong:indirectAddress]];
+        symbolNames[@(indirectAddress)] = symbolName;
       }
       
       [node.details appendRow:@"":@"":@"Section"
@@ -1688,7 +1661,7 @@ using namespace std;
                              (libOrdinal == SELF_LIBRARY_ORDINAL ? @"SELF_LIBRARY_ORDINAL" :
                               libOrdinal == DYNAMIC_LOOKUP_ORDINAL ? @"DYNAMIC_LOOKUP_ORDINAL" :
                               libOrdinal == EXECUTABLE_ORDINAL ? @"EXECUTABLE_ORDINAL" :
-                              [NSSTRING((uint8_t *)dylib + dylib->name.offset - sizeof(struct load_command)) lastPathComponent])];
+                              NSSTRING((uint8_t *)dylib + dylib->name.offset - sizeof(struct load_command)).lastPathComponent)];
     ++index;
     
     [node.details appendRow:@"":@"":@"TOC Index"

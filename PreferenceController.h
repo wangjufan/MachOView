@@ -8,9 +8,9 @@
 
 @interface MVPreferenceController: NSWindowController
 {
-  IBOutlet NSButton *   openAtLaunch;
+  IBOutlet NSButton *   useLLVMDisassembler;
 }
 
-- (IBAction)toggleOpenAtLaunch:(id)sender;
+- (IBAction)toggleUseLLVMDisassembler:(id)sender;
 
 @end

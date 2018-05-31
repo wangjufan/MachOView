@@ -121,12 +121,12 @@ struct MVNodeSaver;
   uint32_t              detailsOffset;
 }
 
-@property (nonatomic)                   NSString *            caption;
+@property (nonatomic)           NSString *            caption;
 @property (nonatomic,weak)      MVNode *              parent;
-@property (nonatomic)                   NSRange               dataRange;
-@property (nonatomic)                   MVTable *             details;
-@property (nonatomic)                   NSMutableDictionary * userInfo;
-@property (nonatomic)                   uint32_t              detailsOffset;
+@property (nonatomic)           NSRange               dataRange;
+@property (nonatomic)           MVTable *             details;
+@property (nonatomic)           NSMutableDictionary * userInfo;
+@property (nonatomic)           uint32_t              detailsOffset;
 
 - (NSUInteger)          numberOfChildren;
 - (MVNode *)            childAtIndex:(NSUInteger)n;

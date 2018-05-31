@@ -6,12 +6,6 @@
  *
  */
 
-#include <string>
-#include <vector>
-#include <set>
-#include <map>
-#include <cxxabi.h>
-
 #import "Common.h"
 #import "FatLayout.h"
 #import "DataController.h"
@@ -24,7 +18,7 @@ using namespace std;
 @implementation FatLayout
 
 //-----------------------------------------------------------------------------
-- (id)initWithDataController:(MVDataController *)dc rootNode:(MVNode *)node
+- (instancetype)initWithDataController:(MVDataController *)dc rootNode:(MVNode *)node
 {
   if (self = [super initWithDataController:dc rootNode:node])
   {

@@ -15,8 +15,8 @@
   MVLayout *    __weak layout;
 }
 
-@property (nonatomic)                   NSString *  name;
-@property (nonatomic)                   uint32_t    length;
+@property (nonatomic)       NSString *  name;
+@property (nonatomic)       uint32_t    length;
 @property (nonatomic,weak)  MVLayout *  layout;
 
 @end

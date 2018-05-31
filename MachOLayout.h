@@ -6,12 +6,6 @@
  *
  */
 
-#include <string>
-#include <vector>
-#include <set>
-#include <map>
-#include <cxxabi.h>
-
 #import "Layout.h"
 
 typedef std::vector<struct load_command const *>          CommandVector;
@@ -27,10 +21,10 @@ typedef std::vector<struct dylib_module_64 const *>       Module64Vector;
 typedef std::vector<struct data_in_code_entry const *>    DataInCodeEntryVector;
 typedef std::vector<uint32_t const *>                     IndirectSymbolVector;
 
-typedef std::map<uint32_t,std::pair<uint32_t,uint64_t> >        RelocMap;           // fileOffset --> <length,value>
-typedef std::map<uint32_t,std::pair<uint64_t,uint64_t> >        SegmentInfoMap;     // fileOffset --> <address,size>
+typedef std::map<uint32_t,std::pair<uint32_t,uint64_t> >  RelocMap;                     // fileOffset --> <length,value>
+typedef std::map<uint32_t,std::pair<uint64_t,uint64_t> >  SegmentInfoMap;               // fileOffset --> <address,size>
 typedef std::map<uint64_t,std::pair<uint32_t,NSDictionary * __weak> >  SectionInfoMap;  // address    --> <fileOffset,sectionUserInfo>
-typedef std::map<uint64_t,uint64_t>                             ExceptionFrameMap;  // LSDA_addr  --> PCBegin_addr
+typedef std::map<uint64_t,uint64_t>                       ExceptionFrameMap;            // LSDA_addr  --> PCBegin_addr
 
 @interface MachOLayout : MVLayout 
 {
@@ -61,13 +55,13 @@ typedef std::map<uint64_t,uint64_t>                             ExceptionFrameMa
 
 + (MachOLayout *)layoutWithDataController:(MVDataController *)dc rootNode:(MVNode *)node;
 
-- (struct section const *)getSectionByIndex:(uint32_t)index;
-- (struct section_64 const *)getSection64ByIndex:(uint32_t)index;
+- (struct section const *)getSectionByIndex:(uint32_t)index NS_RETURNS_INNER_POINTER;
+- (struct section_64 const *)getSection64ByIndex:(uint32_t)index NS_RETURNS_INNER_POINTER;
 
-- (struct nlist const *)getSymbolByIndex:(uint32_t)index;
-- (struct nlist_64 const *)getSymbol64ByIndex:(uint32_t)index;
+- (struct nlist const *)getSymbolByIndex:(uint32_t)index NS_RETURNS_INNER_POINTER;
+- (struct nlist_64 const *)getSymbol64ByIndex:(uint32_t)index NS_RETURNS_INNER_POINTER;
 
-- (struct dylib const *)getDylibByIndex:(uint32_t)index;
+- (struct dylib const *)getDylibByIndex:(uint32_t)index NS_RETURNS_INNER_POINTER;
 
 - (NSDictionary *)userInfoForSection:(struct section const *)section;
 - (NSDictionary *)userInfoForSection64:(struct section_64 const *)section_64;
