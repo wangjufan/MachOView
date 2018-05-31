@@ -6,7 +6,6 @@
  *
  */
 
-
 #define MATCH_STRUCT(obj,location) \
   struct obj const * obj = (struct obj *)[self imageAt:(location)]; \
   if (!obj) [NSException raise:@"null exception" format:@#obj " is null"];
@@ -20,6 +19,7 @@
 {
   MVNode *              __weak rootNode;
   MVDataController *    __weak dataController;
+    
   uint32_t              imageOffset;  // absolute physical offset of the image in binary
   uint32_t              imageSize;    // size of the image corresponds to this layout
   NSThread *            backgroundThread;
@@ -30,9 +30,12 @@
 @property(nonatomic,readonly)       NSThread * backgroundThread;
 @property(nonatomic,readonly)       MVArchiver * archiver;
 
-- (instancetype)        initWithDataController:(MVDataController *)dc rootNode:(MVNode *)node NS_DESIGNATED_INITIALIZER;
+- (instancetype)        initWithDataController:(MVDataController *)dc
+                                rootNode:(MVNode *)node NS_DESIGNATED_INITIALIZER;
 - (void const *)        imageAt:(uint32_t)location NS_RETURNS_INNER_POINTER;
-- (void)                printException:(NSException *)exception caption:(NSString *)caption;
+- (void)                printException:(NSException *)exception
+                            caption:(NSString *)caption;
+
 - (BOOL)                is64bit;
 - (void)                doMainTasks;
 - (void)                doBackgroundTasks;

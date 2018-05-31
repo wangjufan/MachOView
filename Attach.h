@@ -15,8 +15,10 @@
 #include <mach/vm_map.h>
 #include <mach-o/loader.h>
 
-int64_t get_image_size(mach_vm_address_t address, pid_t pid, uint64_t *vmaddr_slide);
 kern_return_t find_main_binary(pid_t pid, mach_vm_address_t *main_address);
+
+int64_t get_image_size(mach_vm_address_t address, pid_t pid, uint64_t *vmaddr_slide);
+
 kern_return_t dump_binary(mach_vm_address_t address, pid_t pid, uint8_t *buffer, uint64_t aslr_slide);
 
 #endif

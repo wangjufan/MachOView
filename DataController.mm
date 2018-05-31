@@ -923,7 +923,8 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
 
 @end
 
-
+//============================================================================
+//============================================================================
 //============================================================================
 @implementation MVDataController
 
@@ -967,8 +968,6 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
     case CPU_TYPE_ARM64:      return @"ARM64";
   }
 }
-
-//----------------------------------------------------------------------------
 -(NSString *)getARMCpu:(cpu_subtype_t)cpusubtype
 {
   switch (cpusubtype)
@@ -986,8 +985,6 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
     case CPU_SUBTYPE_ARM_V8:      return @"ARM_V8";
   }
 }
-
-//----------------------------------------------------------------------------
 -(NSString *)getARM64Cpu:(cpu_subtype_t)cpusubtype
 {
   switch (cpusubtype)
@@ -997,8 +994,6 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
     case CPU_SUBTYPE_ARM64_V8:    return @"ARM64_V8";
   }
 }
-
-//----------------------------------------------------------------------------
 -(BOOL)isSupportedMachine:(NSString *)machine
 {
   return ([machine isEqualToString:@"X86"] == YES ||
@@ -1008,95 +1003,7 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
 }
 
 //----------------------------------------------------------------------------
--(void)createMachOLayout:(MVNode *)node
-             mach_header:(struct mach_header const *)mach_header
-{
-  NSString * machine = [self getMachine:mach_header->cputype];
-  
-  node.caption = [NSString stringWithFormat:@"%@ (%@)",
-                  mach_header->filetype == MH_OBJECT      ? @"Object " :
-                  mach_header->filetype == MH_EXECUTE     ? @"Executable " :
-                  mach_header->filetype == MH_FVMLIB      ? @"Fixed VM Shared Library" :
-                  mach_header->filetype == MH_CORE        ? @"Core" :
-                  mach_header->filetype == MH_PRELOAD     ? @"Preloaded Executable" :
-                  mach_header->filetype == MH_DYLIB       ? @"Shared Library " : 
-                  mach_header->filetype == MH_DYLINKER    ? @"Dynamic Link Editor" :
-                  mach_header->filetype == MH_BUNDLE      ? @"Bundle" : 
-                  mach_header->filetype == MH_DYLIB_STUB  ? @"Shared Library Stub" : 
-                  mach_header->filetype == MH_DSYM        ? @"Debug Symbols" : 
-                  mach_header->filetype == MH_KEXT_BUNDLE ? @"Kernel Extension" : @"?????",
-                  [machine isEqualToString:@"ARM"] == YES ? [self getARMCpu:mach_header->cpusubtype] : machine];
-  
-  MachOLayout * layout = [MachOLayout layoutWithDataController:self rootNode:node];
-                          
-  (node.userInfo)[MVLayoutUserInfoKey] = layout;
-  
-  if ([self isSupportedMachine:machine])
-  {
-    [layouts addObject:layout];
-  }
-  else
-  {
-    // there is no detail to extract
-    [layout.archiver halt];
-  }
-}
-
 //----------------------------------------------------------------------------
--(void)createMachO64Layout:(MVNode *)node
-            mach_header_64:(struct mach_header_64 const *)mach_header_64
-{
-  NSString * machine = [self getMachine:mach_header_64->cputype];
-  
-  node.caption = [NSString stringWithFormat:@"%@ (%@)",
-                  mach_header_64->filetype == MH_OBJECT      ? @"Object " :
-                  mach_header_64->filetype == MH_EXECUTE     ? @"Executable " :
-                  mach_header_64->filetype == MH_FVMLIB      ? @"Fixed VM Shared Library" :
-                  mach_header_64->filetype == MH_CORE        ? @"Core" :
-                  mach_header_64->filetype == MH_PRELOAD     ? @"Preloaded Executable" :
-                  mach_header_64->filetype == MH_DYLIB       ? @"Shared Library " :
-                  mach_header_64->filetype == MH_DYLINKER    ? @"Dynamic Link Editor" :
-                  mach_header_64->filetype == MH_BUNDLE      ? @"Bundle" :
-                  mach_header_64->filetype == MH_DYLIB_STUB  ? @"Shared Library Stub" :
-                  mach_header_64->filetype == MH_DSYM        ? @"Debug Symbols" :
-                  mach_header_64->filetype == MH_KEXT_BUNDLE ? @"Kernel Extension" : @"?????",
-                  [machine isEqualToString:@"ARM64"] == YES ? [self getARM64Cpu:mach_header_64->cpusubtype] : machine];
-  
-  MachOLayout * layout = [MachOLayout layoutWithDataController:self rootNode:node];
-  
-  (node.userInfo)[MVLayoutUserInfoKey] = layout;
-  
-  if ([self isSupportedMachine:machine])
-  {
-    [layouts addObject:layout];
-  }
-  else
-  {
-    // there is no detail to extract
-    [layout.archiver halt];
-  }
-}
-
-//----------------------------------------------------------------------------
--(void)createArchiveLayout:(MVNode *)node machine:(NSString *)machine
-{
-  node.caption = machine ? [NSString stringWithFormat:@"Static Library (%@)", machine] : @"Static Library";
-
-  ArchiveLayout * layout = [ArchiveLayout layoutWithDataController:self rootNode:node];
-
-  (node.userInfo)[MVLayoutUserInfoKey] = layout;
-
-  if (machine == nil || [self isSupportedMachine:machine])
-  {
-    [layouts addObject:layout];
-  }
-  else
-  {
-    // there is no detail to extract
-    [layout.archiver halt];
-  }
-}
-
 //----------------------------------------------------------------------------
 // create Mach-O layouts based on file headers
 - (void)createLayouts:(MVNode *)parent
@@ -1104,7 +1011,7 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
                length:(uint32_t)length
 {
   uint32_t magic = *(uint32_t*)((uint8_t *)fileData.bytes + location);
-  
+//  mach_header
   switch (magic)
   {
     case FAT_MAGIC:
@@ -1114,7 +1021,7 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
       [fileData getBytes:&fat_header range:NSMakeRange(location, sizeof(struct fat_header))];
       if (magic == FAT_CIGAM)
         swap_fat_header(&fat_header, NX_LittleEndian);
-      [self createFatLayout:parent fat_header:&fat_header];
+      [self createFatLayout:parent fat_header:&fat_header];//////////////
     } break;
       
     case MH_MAGIC:
@@ -1124,27 +1031,106 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
       [fileData getBytes:&mach_header range:NSMakeRange(location, sizeof(struct mach_header))];
       if (magic == MH_CIGAM)
         swap_mach_header(&mach_header, NX_LittleEndian);
-      [self createMachOLayout:parent mach_header:&mach_header];
+      [self createMachOLayout:parent mach_header:&mach_header];//////////////
     } break;
-      
     case MH_MAGIC_64:
     case MH_CIGAM_64:
     {
       struct mach_header_64 mach_header_64;
       [fileData getBytes:&mach_header_64 range:NSMakeRange(location, sizeof(struct mach_header_64))];
-      if (magic == MH_CIGAM_64)
+   
+        if (magic == MH_CIGAM_64)
+            //MH_CIGAM can be used when the byte ordering scheme of the target machine is the reverse of the host CPU.
         swap_mach_header_64(&mach_header_64, NX_LittleEndian);
-      [self createMachO64Layout:parent mach_header_64:&mach_header_64];
+        
+      [self createMachO64Layout:parent mach_header_64:&mach_header_64];////////////////////////
     } break;
       
     default:
-      [self createArchiveLayout:parent machine:nil];
+      [self createArchiveLayout:parent machine:nil];////////////////////////
   }
   
   parent.dataRange = NSMakeRange(location, length);
 }
-
-//----------------------------------------------------------------------------
+-(void)createMachOLayout:(MVNode *)node
+             mach_header:(struct mach_header const *)mach_header
+{
+    NSString * machine = [self getMachine:mach_header->cputype];
+    
+    node.caption = [NSString stringWithFormat:@"%@ (%@)",
+                    mach_header->filetype == MH_OBJECT      ? @"Object " :
+                    mach_header->filetype == MH_EXECUTE     ? @"Executable " :
+                    mach_header->filetype == MH_FVMLIB      ? @"Fixed VM Shared Library" :
+                    mach_header->filetype == MH_CORE        ? @"Core" :
+                    mach_header->filetype == MH_PRELOAD     ? @"Preloaded Executable" :
+                    mach_header->filetype == MH_DYLIB       ? @"Shared Library " :
+                    mach_header->filetype == MH_DYLINKER    ? @"Dynamic Link Editor" :
+                    mach_header->filetype == MH_BUNDLE      ? @"Bundle" :
+                    mach_header->filetype == MH_DYLIB_STUB  ? @"Shared Library Stub" :
+                    mach_header->filetype == MH_DSYM        ? @"Debug Symbols" :
+                    mach_header->filetype == MH_KEXT_BUNDLE ? @"Kernel Extension" : @"?????",
+                    [machine isEqualToString:@"ARM"] == YES ? [self getARMCpu:mach_header->cpusubtype] : machine];
+    
+    MachOLayout * layout = [MachOLayout layoutWithDataController:self rootNode:node];
+    
+    (node.userInfo)[MVLayoutUserInfoKey] = layout;
+    
+    if ([self isSupportedMachine:machine])
+    {
+        [layouts addObject:layout];
+    }
+    else
+    {
+        // there is no detail to extract
+        [layout.archiver halt];
+    }
+}
+-(void)createMachO64Layout:(MVNode *)node
+            mach_header_64:(struct mach_header_64 const *)mach_header_64
+{
+    NSString * machine = [self getMachine:mach_header_64->cputype];
+    
+    node.caption = [NSString stringWithFormat:@"%@ (%@)",
+                    mach_header_64->filetype == MH_OBJECT      ? @"Object " :
+                    mach_header_64->filetype == MH_EXECUTE     ? @"Executable " :
+                    mach_header_64->filetype == MH_FVMLIB      ? @"Fixed VM Shared Library" :
+                    mach_header_64->filetype == MH_CORE        ? @"Core" :
+                    mach_header_64->filetype == MH_PRELOAD     ? @"Preloaded Executable" :
+                    mach_header_64->filetype == MH_DYLIB       ? @"Shared Library " :
+                    mach_header_64->filetype == MH_DYLINKER    ? @"Dynamic Link Editor" :
+                    mach_header_64->filetype == MH_BUNDLE      ? @"Bundle" :
+                    mach_header_64->filetype == MH_DYLIB_STUB  ? @"Shared Library Stub" :
+                    mach_header_64->filetype == MH_DSYM        ? @"Debug Symbols" :
+                    mach_header_64->filetype == MH_KEXT_BUNDLE ? @"Kernel Extension" : @"?????",
+                    [machine isEqualToString:@"ARM64"] == YES ? [self getARM64Cpu:mach_header_64->cpusubtype] : machine];
+    
+    MachOLayout * layout = [MachOLayout layoutWithDataController:self rootNode:node];
+    (node.userInfo)[MVLayoutUserInfoKey] = layout;
+    if ([self isSupportedMachine:machine]){
+        [layouts addObject:layout];
+    }else{
+        // there is no detail to extract
+        [layout.archiver halt];
+    }
+}
+-(void)createArchiveLayout:(MVNode *)node machine:(NSString *)machine
+{
+    node.caption = machine ? [NSString stringWithFormat:@"Static Library (%@)", machine] : @"Static Library";
+    
+    ArchiveLayout * layout = [ArchiveLayout layoutWithDataController:self rootNode:node];
+    
+    (node.userInfo)[MVLayoutUserInfoKey] = layout;
+    
+    if (machine == nil || [self isSupportedMachine:machine])
+    {
+        [layouts addObject:layout];
+    }
+    else
+    {
+        // there is no detail to extract
+        [layout.archiver halt];
+    }
+}
 -(void)createFatLayout:(MVNode *)node
             fat_header:(struct fat_header const *)fat_header
 {
@@ -1174,6 +1160,7 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
   }
 }
 
+//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 - (void)treeViewWillChange
 {
@@ -1220,6 +1207,7 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
 
 #pragma mark -
 
+//============================================================================
 //============================================================================
 @implementation MVArchiver
 
@@ -1368,13 +1356,12 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
 @end
 
 //-----------------------------------------------------------------------------
-MVNodeSaver::MVNodeSaver() 
+//-----------------------------------------------------------------------------
+MVNodeSaver::MVNodeSaver()
   : m_node(nil) 
 {
 }
-
-//-----------------------------------------------------------------------------
-MVNodeSaver::~MVNodeSaver() 
+MVNodeSaver::~MVNodeSaver()
 {
   MVLayout * layout = (m_node.userInfo)[MVLayoutUserInfoKey];
   [layout.archiver addObjectToSave:m_node];

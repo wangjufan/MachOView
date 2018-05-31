@@ -68,7 +68,7 @@ find_main_binary(pid_t pid, mach_vm_address_t *main_address)
 /*
  * we need to find the binary file size
  * which is taken from the filesize field of each segment command
- * and not the vmsize (because of alignment)
+ * and not the vmsize (because of alignment and ???)
  * if we dump using vmaddresses, we will get the alignment space into the dumped
  * binary and get into problems :-)
  */

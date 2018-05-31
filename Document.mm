@@ -472,6 +472,7 @@ enum ViewType
   }
 }
 
+//------------------------------- data load template ---------------------------------------------
 //----------------------------------------------------------------------------
 - (void)windowControllerDidLoadNib:(NSWindowController *)aController
 {
@@ -528,25 +529,24 @@ enum ViewType
 
   NSURL * tmpURL = [NSURL fileURLWithPath:@(tmpFilePath)];
   free(tmpFilePath);
-  
-  [[NSFileManager defaultManager] copyItemAtURL:absoluteURL 
-                                          toURL:tmpURL
-                                          error:outError];
+  [[NSFileManager defaultManager] copyItemAtURL:absoluteURL
+                            toURL:tmpURL
+                        error:outError];
   if (*outError) return NO;
   
   // open the copied binary for patching
   dataController.realData = [NSMutableData dataWithContentsOfURL:tmpURL
-                                                         options:NSDataReadingMappedAlways 
-                                                           error:outError];
+                                    options:NSDataReadingMappedAlways
+                                      error:outError];
   if (*outError) return NO;
-  
   // open the original binary for viewing/editing
   dataController.fileName = absoluteURL.path;
   dataController.fileData = [NSMutableData dataWithContentsOfURL:absoluteURL 
-                                                         options:NSDataReadingMappedIfSafe 
-                                                           error:outError];
+                                    options:NSDataReadingMappedIfSafe
+                                error:outError];
   if (*outError) return NO;
 
+    NSLog(@"%@", dataController.realData);
   @try 
   {
     [dataController createLayouts:dataController.rootNode location:0 length:(dataController.fileData).length];

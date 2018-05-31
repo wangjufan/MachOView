@@ -41,6 +41,21 @@ struct MVNodeSaver;
 @end
 
 //----------------------------------------------------------------------------
+@interface MVArchiver : NSObject
+{
+    NSString *            swapPath;
+    NSMutableArray *      objectsToSave; // conforms MVSerializing
+    NSThread *            saverThread;
+    NSLock *              saverLock;
+}
+@property (nonatomic,readonly)  NSString * swapPath;
++(MVArchiver *) archiverWithPath:(NSString *)path;
+-(void) addObjectToSave:(id)object;
+-(void) suspend;
+-(void) resume;
+-(void) halt;
+@end
+//----------------------------------------------------------------------------
 @interface MVColoumns : NSObject
 {
   NSString *            offsetStr;
@@ -48,16 +63,12 @@ struct MVNodeSaver;
   NSString *            descriptionStr;
   NSString *            valueStr;
 }
-
 @property (nonatomic)   NSString * offsetStr;
 @property (nonatomic)   NSString * dataStr;
 @property (nonatomic)   NSString * descriptionStr;
 @property (nonatomic)   NSString * valueStr;
-
 +(MVColoumns *) coloumnsWithData:(NSString *)col0 :(NSString *)col1 :(NSString *)col2 :(NSString *)col3;
-
 @end
-
 //----------------------------------------------------------------------------
 @interface MVRow : NSObject <MVSerializing>
 {
@@ -69,19 +80,13 @@ struct MVNodeSaver;
   BOOL                  deleted;
   BOOL                  dirty;            // eg. attributes has changed
 }
-
 @property (nonatomic)   NSDictionary * attributes;
 @property (nonatomic)   MVColoumns * coloumns;
 @property (nonatomic)   uint32_t offset;
 @property (nonatomic)   BOOL deleted;
 @property (nonatomic)   BOOL dirty;
-
 -(NSString *)coloumnAtIndex:(NSUInteger)index;
-
 @end
-
-@class MVArchiver;
-
 //----------------------------------------------------------------------------
 @interface MVTable : NSObject
 {
@@ -91,12 +96,9 @@ struct MVNodeSaver;
   FILE *                swapFile;
   NSLock *              tableLock;
 }
-
 @property (nonatomic)   FILE * swapFile;
-
 - (NSUInteger)          rowCountToDisplay;
 - (MVRow *)             getRowToDisplay:(NSUInteger)rowIndex;
-
 - (void)                popRow;
 - (void)                appendRow:(id)col0 :(id)col1 :(id)col2 :(id)col3;
 - (void)                insertRowWithOffset:(uint32_t)offset :(id)col0 :(id)col1 :(id)col2 :(id)col3;
@@ -106,10 +108,7 @@ struct MVNodeSaver;
 - (void)                setAttributes:(NSString *)firstArg, ... NS_REQUIRES_NIL_TERMINATION;
 - (void)                setAttributesForRowIndex:(NSUInteger)index :(NSString *)firstArg, ... NS_REQUIRES_NIL_TERMINATION;
 - (void)                setAttributesFromRowIndex:(NSUInteger)index :(NSString *)firstArg, ... NS_REQUIRES_NIL_TERMINATION;
-
 @end
-
-//----------------------------------------------------------------------------
 @interface MVNode : NSObject <MVSerializing>
 {
   NSString *            caption;
@@ -120,14 +119,12 @@ struct MVNodeSaver;
   NSMutableDictionary * userInfo;
   uint32_t              detailsOffset;
 }
-
 @property (nonatomic)           NSString *            caption;
 @property (nonatomic,weak)      MVNode *              parent;
 @property (nonatomic)           NSRange               dataRange;
 @property (nonatomic)           MVTable *             details;
 @property (nonatomic)           NSMutableDictionary * userInfo;
 @property (nonatomic)           uint32_t              detailsOffset;
-
 - (NSUInteger)          numberOfChildren;
 - (MVNode *)            childAtIndex:(NSUInteger)n;
 - (MVNode *)            insertChild:(NSString *)_caption location:(uint32_t)location length:(uint32_t)length;
@@ -139,9 +136,10 @@ struct MVNodeSaver;
 - (void)                filterDetails:(NSString *)filter;
 - (void)                loadFromFile:(FILE *)pFile;
 - (void)                saveToFile:(FILE *)pFile;
-
 @end
 
+//----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 //----------------------------------------------------------------------------
 @interface MVDataController : NSObject
 {
@@ -165,32 +163,18 @@ struct MVNodeSaver;
 -(NSString *)           getMachine:(cpu_type_t)cputype;
 -(NSString *)           getARMCpu:(cpu_subtype_t)cpusubtype;
 
-- (void)                createLayouts:(MVNode *)parent location:(uint32_t)location length:(uint32_t)length;
+- (void)                createLayouts:(MVNode *)parent
+                        location:(uint32_t)location
+                        length:(uint32_t)length;
+
 - (void)                updateTreeView: (MVNode *)node;
 - (void)                updateTableView;
 - (void)                updateStatus: (NSString *)status;
 
 @end
 
+
 //----------------------------------------------------------------------------
-@interface MVArchiver : NSObject
-{
-  NSString *            swapPath;
-  NSMutableArray *      objectsToSave; // conforms MVSerializing
-  NSThread *            saverThread;
-  NSLock *              saverLock;
-}
-
-@property (nonatomic,readonly)  NSString * swapPath;
-
-+(MVArchiver *) archiverWithPath:(NSString *)path;
--(void) addObjectToSave:(id)object;
--(void) suspend;
--(void) resume;
--(void) halt;
-
-@end
-
 //----------------------------------------------------------------------------
 struct MVNodeSaver
 {

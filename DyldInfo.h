@@ -8,16 +8,12 @@
 
 #import "MachOLayout.h"
 
-
 @interface DyldHelper : NSObject
 {
   NSMutableDictionary * externalMap; // external symbol name --> symbols index (negative number)
 }
-
 +(DyldHelper *) dyldHelperWithSymbols:(NSDictionary *)symbolNames is64Bit:(bool)is64Bit;
-
 @end
-
 
 @interface MachOLayout (DyldInfo)
 

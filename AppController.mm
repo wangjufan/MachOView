@@ -75,7 +75,7 @@ int64_t nrow_loaded; // number of loaded rows
  * menu item action to attach to a process and read its mach-o header
  */
 - (IBAction)attach:(id)sender
-{
+{//not used
   NSAlert *alert = [[NSAlert alloc] init];
   alert.messageText = @"Insert PID to attach to:";
   [alert addButtonWithTitle:@"Attach"];
@@ -90,6 +90,7 @@ int64_t nrow_loaded; // number of loaded rows
     pid_t targetPid = input.intValue;
     NSLog(@"Attach to process %d", targetPid);
     mach_vm_address_t mainAddress = 0;
+      ////////////////////////////////////////////////
     if (find_main_binary(targetPid, &mainAddress))
     {
       NSLog(@"Failed to find main binary address!");
@@ -97,6 +98,7 @@ int64_t nrow_loaded; // number of loaded rows
     }
     uint64_t aslr_slide = 0;
     uint64_t imagesize = 0;
+      ////////////////////////////////////////////////////////////////
     if ( (imagesize = get_image_size(mainAddress, targetPid, &aslr_slide)) == 0 )
     {
       NSLog(@"[ERROR] Got image file size equal to 0!");
@@ -109,6 +111,7 @@ int64_t nrow_loaded; // number of loaded rows
       NSLog(@"Can't allocate mem for dumping target!");
       return;
     }
+      ////////////////////////////////////////////////////////////////////////////////
     /* and finally read the sections and dump their contents to the buffer */
     if (dump_binary(mainAddress, targetPid, readbuffer, aslr_slide))
     {
@@ -172,8 +175,7 @@ int64_t nrow_loaded; // number of loaded rows
   [openPanel setCanChooseFiles:YES];
   openPanel.delegate = self; // for filtering files in open panel with shouldShowFilename
   [openPanel beginSheetModalForWindow:NSApp.modalWindow
-                    completionHandler:^(NSInteger result)
-                    {
+                completionHandler:^(NSInteger result) {
                       if (result != NSFileHandlingPanelOKButton)
                       {
                         return;
@@ -314,7 +316,7 @@ int64_t nrow_loaded; // number of loaded rows
   NSDocumentController * documentController = [NSDocumentController sharedDocumentController];
   
   [documentController openDocumentWithContentsOfURL:[NSURL fileURLWithPath:filename]
-                                            display:YES
+                                display:YES
                                   completionHandler:^(NSDocument * _Nullable document, BOOL documentWasAlreadyOpen, NSError * _Nullable error)
                                   {
                                     if (!document)
