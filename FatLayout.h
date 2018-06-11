@@ -10,7 +10,7 @@
 
 @interface FatLayout : MVLayout;
 
-+ (FatLayout *)     layoutWithDataController:(MVDataController *)dc rootNode:(MVNode *)node;
++ (FatLayout *) layoutWithDataController:(MVDataController *)dc rootNode:(MVNode *)node;
 
 @end
 

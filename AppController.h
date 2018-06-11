@@ -14,10 +14,8 @@
 {
   MVPreferenceController * preferenceController;
 }
-
 - (IBAction)showPreferencePanel:(id)sender;
 - (IBAction)attach:(id)sender;
-
 @end
 
 

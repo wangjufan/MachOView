@@ -14,7 +14,6 @@
                     location:(uint32_t)location
                       length:(uint32_t)length
                  baseAddress:(uint32_t)baseAddress;
-
 - (MVNode *) createReloc64Node:(MVNode *)parent
                        caption:(NSString *)caption
                       location:(uint32_t)location
@@ -25,7 +24,6 @@
                        caption:(NSString *)caption
                       location:(uint32_t)location
                         length:(uint32_t)length;
-
 - (MVNode *) createSymbols64Node:parent 
                          caption:(NSString *)caption
                         location:(uint32_t)location
@@ -40,7 +38,6 @@
                         caption:(NSString *)caption
                        location:(uint32_t)location
                          length:(uint32_t)length;
-
 - (MVNode *) createISymbols64Node:parent
                           caption:(NSString *)caption
                          location:(uint32_t)location
@@ -50,7 +47,6 @@
                    caption:(NSString *)caption
                   location:(uint32_t)location
                     length:(uint32_t)length;
-
 - (MVNode *) createTOC64Node:parent
                      caption:(NSString *)caption
                     location:(uint32_t)location
@@ -60,7 +56,6 @@
                        caption:(NSString *)caption
                       location:(uint32_t)location
                         length:(uint32_t)length;
-
 - (MVNode *) createModules64Node:parent
                          caption:(NSString *)caption
                         location:(uint32_t)location
@@ -88,7 +83,6 @@
                                  caption:(NSString *)caption
                                 location:(uint32_t)location
                                   length:(uint32_t)length;
-
 
 @end
 

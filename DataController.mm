@@ -1103,7 +1103,6 @@ NSString * const MVStatusTaskTerminated           = @"MVStatusTaskTerminated";
                     mach_header_64->filetype == MH_DSYM        ? @"Debug Symbols" :
                     mach_header_64->filetype == MH_KEXT_BUNDLE ? @"Kernel Extension" : @"?????",
                     [machine isEqualToString:@"ARM64"] == YES ? [self getARM64Cpu:mach_header_64->cpusubtype] : machine];
-    
     MachOLayout * layout = [MachOLayout layoutWithDataController:self rootNode:node];
     (node.userInfo)[MVLayoutUserInfoKey] = layout;
     if ([self isSupportedMachine:machine]){

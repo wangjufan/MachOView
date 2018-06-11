@@ -7,14 +7,11 @@
  */
 
 #import "MachOLayout.h"
-
 @interface MachOLayout (Exceptions)
-
 - (MVNode *)createCFINode:(MVNode *)parent
                 caption:(NSString *)caption
                location:(uint32_t)location
                    length:(uint32_t)length;
-
 
 - (MVNode *)createLSDANode:(MVNode *)parent
                  caption:(NSString *)caption
@@ -26,6 +23,4 @@
                         caption:(NSString *)caption
                     location:(uint32_t)location
                 header:(struct unwind_info_section_header const *)unwind_info_section_header;
-
-
 @end

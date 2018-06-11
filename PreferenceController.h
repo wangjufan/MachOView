@@ -10,7 +10,6 @@
 {
   IBOutlet NSButton *   useLLVMDisassembler;
 }
-
 - (IBAction)toggleUseLLVMDisassembler:(id)sender;
-
 @end
+

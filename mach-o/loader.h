@@ -1155,21 +1155,21 @@ struct rpath_command {
     union lc_str path;		/* path to add to run path */
 };
 
-/*
+/* 链接-编辑 段
  * The linkedit_data_command contains the offsets and sizes of a blob
- * of data in the __LINKEDIT segment.  
+ * of data in the __LINKEDIT segment.
  */
 struct linkedit_data_command {
-    uint32_t	cmd;		/* LC_CODE_SIGNATURE, LC_SEGMENT_SPLIT_INFO,
-                                   LC_FUNCTION_STARTS, LC_DATA_IN_CODE,
-				   LC_DYLIB_CODE_SIGN_DRS or
-				   LC_LINKER_OPTIMIZATION_HINT. */
+    uint32_t	cmd;		 /* LC_CODE_SIGNATURE, LC_SEGMENT_SPLIT_INFO,
+                                            LC_FUNCTION_STARTS, LC_DATA_IN_CODE,
+                                            LC_DYLIB_CODE_SIGN_DRS or
+                                            LC_LINKER_OPTIMIZATION_HINT. */
     uint32_t	cmdsize;	/* sizeof(struct linkedit_data_command) */
     uint32_t	dataoff;	/* file offset of data in __LINKEDIT segment */
     uint32_t	datasize;	/* file size of data in __LINKEDIT segment  */
 };
 
-/*
+/*加密信息 段
  * The encryption_info_command contains the file offset and size of an
  * of an encrypted segment.
  */

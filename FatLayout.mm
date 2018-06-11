@@ -63,8 +63,7 @@ using namespace std;
                          :@"Number of Architecture"
                          :[NSString stringWithFormat:@"%u",fat_header->nfat_arch]];
   
-  [node.details setAttributes:MVCellColorAttributeName,[NSColor greenColor],
-                              MVUnderlineAttributeName,@"YES",nil];
+  [node.details setAttributes:MVCellColorAttributeName,[NSColor greenColor],MVUnderlineAttributeName,@"YES",nil];
   
   for (uint32_t nimg = 0; nimg < fat_header->nfat_arch; ++nimg)
   {      

@@ -237,9 +237,11 @@ int64_t nrow_loaded; // number of loaded rows
   return NO;
 }
 
+
 //----------------------------------------------------------------------------
 - (void)applicationWillFinishLaunching:(NSNotification *)aNotification
 {
+    
   BOOL isFirstMachOView = [self isOnlyRunningMachOView];
   
   // disable the state resume feature, it's not very useful with MachOView

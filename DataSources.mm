@@ -16,9 +16,7 @@ NSString * const MVScannerErrorMessage  = @"NSScanner error";
 
 //============================================================================
 @implementation MVDataSourceTree
-
 #pragma mark NSOutlineView must-have delegates
-
 - (NSInteger)outlineView:(NSOutlineView *)outlineView numberOfChildrenOfItem:(id)item 
 {
   if (item == nil)
@@ -30,7 +28,6 @@ NSString * const MVScannerErrorMessage  = @"NSScanner error";
   return node.numberOfChildren;
 }
 //----------------------------------------------------------------------------
-
 - (BOOL)outlineView:(NSOutlineView *)outlineView isItemExpandable:(id)item 
 {
   if (item == nil)
@@ -42,7 +39,6 @@ NSString * const MVScannerErrorMessage  = @"NSScanner error";
   return (node.numberOfChildren > 0);
 }
 //----------------------------------------------------------------------------
-
 - (id)outlineView:(NSOutlineView *)outlineView child:(NSInteger)index ofItem:(id)item 
 {
   MVDocument * document = outlineView.window.windowController.document;
@@ -73,15 +69,12 @@ NSString * const MVScannerErrorMessage  = @"NSScanner error";
   return node.caption;
 }
 //----------------------------------------------------------------------------
-
 @end
 
-
+//============================================================================
 //============================================================================
 @implementation MVDataSourceDetails
-
 #pragma mark NSTableView must-have delegates
-
 - (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
 {
   MVDocument * document = aTableView.window.windowController.document;
@@ -101,7 +94,6 @@ NSString * const MVScannerErrorMessage  = @"NSScanner error";
   return selectedNode.details.rowCountToDisplay;
 }
 //----------------------------------------------------------------------------
-
 - (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
   MVDocument * document = aTableView.window.windowController.document;
@@ -203,7 +195,6 @@ NSString * const MVScannerErrorMessage  = @"NSScanner error";
   return nil;
 }
 //----------------------------------------------------------------------------
-
 - (void)tableView:(NSTableView *)aTableView setObjectValue:(id)anObject forTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
 {
   BOOL scanResult;
@@ -308,7 +299,5 @@ NSString * const MVScannerErrorMessage  = @"NSScanner error";
   [document updateChangeCount:NSChangeDone];
 }
 //----------------------------------------------------------------------------
-
-
-
 @end
+

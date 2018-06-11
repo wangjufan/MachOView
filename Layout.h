@@ -18,10 +18,12 @@
 @interface MVLayout : NSObject 
 {
   MVNode *              __weak rootNode;
-  MVDataController *    __weak dataController;
+  MVDataController *    __weak dataController;  // data privider
     
-  uint32_t              imageOffset;  // absolute physical offset of the image in binary
-  uint32_t              imageSize;    // size of the image corresponds to this layout
+  uint32_t              imageOffset;  // absolute physical offset of the image in binary .
+//    It is the location in memory for the viewing .
+  uint32_t              imageSize;    // size of the image corresponds to this layout.
+//    file image or loaded image ???
   NSThread *            backgroundThread;
   MVArchiver *          archiver;
 }

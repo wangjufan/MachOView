@@ -730,13 +730,17 @@ _hex2int(char const * a, uint32_t len)
           segs_read_write_addr = segment_command_64->vmaddr;
         }
       } break;
+            
       case LC_SYMTAB: symtab_command = (struct symtab_command const *)load_command; break;
       case LC_DYSYMTAB: dysymtab_command = (struct dysymtab_command const *)load_command; break;
+            
       case LC_TWOLEVEL_HINTS: twolevel_hints_command = (struct twolevel_hints_command const *)load_command; break;
+            
       case LC_SEGMENT_SPLIT_INFO: segment_split_info = (struct linkedit_data_command const *)load_command; break;
       case LC_CODE_SIGNATURE: code_signature = (struct linkedit_data_command const *)load_command; break;
       case LC_FUNCTION_STARTS: function_starts = (struct linkedit_data_command const *)load_command; break;
       case LC_DATA_IN_CODE: data_in_code_entries = (struct linkedit_data_command const *)load_command; break;
+            
       default: ; // not interested
     }
   }
